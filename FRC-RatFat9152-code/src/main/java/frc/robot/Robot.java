@@ -31,6 +31,8 @@ import edu.wpi.first.cameraserver.CameraServer;
 
 public class Robot extends TimedRobot {
   private static final String kDefaultAuto = "Default";
+  private static final String Taxi = "Taxi";
+
   private static final String kCustomAuto = "My Auto";
   private String m_autoSelected;
   private final SendableChooser<String> m_chooser = new SendableChooser<>();
@@ -67,6 +69,7 @@ public class Robot extends TimedRobot {
     CameraServer.startAutomaticCapture();
     m_chooser.addOption(kDefaultAuto, kDefaultAuto);
     m_chooser.addOption(kCustomAuto, kCustomAuto);
+    m_chooser.addOption(Taxi, Taxi);
     SmartDashboard.putData("Auto Choice",m_chooser);
 
 
@@ -87,31 +90,51 @@ public class Robot extends TimedRobot {
   public void autonomousPeriodic() {
     switch(m_autoSelected){
       case kCustomAuto:
-        //TODO: Put Auto code here
+      if (m_timer.get() < 1.0) {
+        // Drive forwards half speed, make sure to turn input squaring off
+         //m_robotDrive.arcadeDrive(0.5, 0.0, false);
+       m_dumpMotor.set(0.2);
+      } 
+      else if(m_timer.get() > 1.0 && m_timer.get() < 2.0)
+      {
+        m_dumpMotor.set(-0.2);
+        // m_robotDrive.arcadeDrive(0.5, -0.5, false);
+      }
+       else if (m_timer.get() > 2.0 && m_timer.get() < 4.0){
+        // m_robotDrive.arcadeDrive(0.5, 0, false);
+       }
+      else {
+        m_dumpMotor.set(0);
+        m_robotDrive.stopMotor(); // stop robot
+      }
+  
         break;
       default:
         break;
     }
-    // Drive for 2 seconds
-    if (m_timer.get() < 1.0) {
-      // Drive forwards half speed, make sure to turn input squaring off
-      // m_robotDrive.arcadeDrive(0.5, 0.0, false);
-     m_dumpMotor.set(0.2);
-    } 
-    else if(m_timer.get() > 1.0 && m_timer.get() < 2.0)
-    {
-      m_dumpMotor.set(-0.2);
-      // m_robotDrive.arcadeDrive(0.5, -0.5, false);
-    }
-    // else if (m_timer.get() > 2.0 && m_timer.get() < 4.0){
-    //   m_robotDrive.arcadeDrive(0.5, 0, false);
-    // }
-    else {
-      m_dumpMotor.set(0);
-      m_robotDrive.stopMotor(); // stop robot
-    }
-  }
 
+    switch(m_autoSelected){
+      case Taxi:
+      if (m_timer.get() < 1.0) {
+        // Drive forwards half speed, make sure to turn input squaring off
+         m_robotDrive.arcadeDrive(0.7, 0.0, false);
+       //m_dumpMotor.set(0.2);
+      } 
+      else if(m_timer.get() > 1.0 && m_timer.get() < 2.0)
+      {
+        //m_dumpMotor.set(-0.2);
+        // m_robotDrive.arcadeDrive(0.5, -0.5, false);
+      }
+       else if (m_timer.get() > 2.0 && m_timer.get() < 4.0){
+        // m_robotDrive.arcadeDrive(0.5, 0, false);
+       }
+      else if(m_timer.get() > 3.5)
+        //m_dumpMotor.set(0);
+        m_robotDrive.stopMotor(); // stop robot
+        break;
+      }
+    }
+  
   /** This function is called once each time the robot enters teleoperated mode. */
   @Override
   public void teleopInit() {}
